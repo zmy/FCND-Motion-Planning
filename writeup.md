@@ -89,6 +89,6 @@ To prune path of unnecessary waypoints, in **line 150-170** I use collinearity t
 
 ### Execute the flight
 #### 1. Does it work?
-It works! Please find the video under the `misc` folder: [video.mp4](misc/video.mp4).
+It works! Please find the video under the `misc` folder: [video.mp4](misc/video.mp4) or at Youtube: <https://youtu.be/THqWp817etA>.
 
 ### Double check that you've met specifications for each of the [rubric](https://review.udacity.com/#!/rubrics/1534/view) points.
