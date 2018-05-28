@@ -51,10 +51,14 @@ class Action(Enum):
     is the cost of performing the action.
     """
 
-    WEST = (0, -1, 1)
-    EAST = (0, 1, 1)
     NORTH = (-1, 0, 1)
+    NORTH_EAST = (-1, 1, np.sqrt(2))
+    EAST = (0, 1, 1)
+    SOUTH_EAST = (1, 1, np.sqrt(2))
     SOUTH = (1, 0, 1)
+    SOUTH_WEST = (1, -1, np.sqrt(2))
+    WEST = (0, -1, 1)
+    NORTH_WEST = (-1, -1, np.sqrt(2))
 
     @property
     def cost(self):
@@ -69,21 +73,18 @@ def valid_actions(grid, current_node):
     """
     Returns a list of valid actions given a grid and current node.
     """
-    valid_actions = list(Action)
+    valid_actions = []
     n, m = grid.shape[0] - 1, grid.shape[1] - 1
     x, y = current_node
 
     # check if the node is off the grid or
     # it's an obstacle
 
-    if x - 1 < 0 or grid[x - 1, y] == 1:
-        valid_actions.remove(Action.NORTH)
-    if x + 1 > n or grid[x + 1, y] == 1:
-        valid_actions.remove(Action.SOUTH)
-    if y - 1 < 0 or grid[x, y - 1] == 1:
-        valid_actions.remove(Action.WEST)
-    if y + 1 > m or grid[x, y + 1] == 1:
-        valid_actions.remove(Action.EAST)
+    for action in list(Action):
+        nx = x + action.delta[0]
+        ny = y + action.delta[1]
+        if 0 <= nx < n and 0 <= ny < m and grid[nx, ny] != 1:
+            valid_actions.append(action)
 
     return valid_actions
 
@@ -144,3 +145,25 @@ def a_star(grid, h, start, goal):
 def heuristic(position, goal_position):
     return np.linalg.norm(np.array(position) - np.array(goal_position))
 
+
+
+def point(p):
+    return np.array([p[0], p[1], 1.]).reshape(1, -1)
+
+def collinearity_check(p1, p2, p3, epsilon=5):
+    m = np.concatenate((p1, p2, p3), 0)
+    det = np.linalg.det(m)
+    return abs(det) < epsilon
+
+def prune_path(path):
+    if path is not None:
+        pruned_path = []
+        for p in path:
+            if len(pruned_path) > 1 and collinearity_check(point(pruned_path[-2]), point(pruned_path[-1]), point(p)):
+                pruned_path[-1] = p
+            else:
+                pruned_path.append(p)
+    else:
+        pruned_path = path
+        
+    return pruned_path
